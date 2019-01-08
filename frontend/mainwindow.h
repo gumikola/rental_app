@@ -6,7 +6,9 @@
 
 namespace Frontend {
 class Equipment;
-}
+class ClientsTab;
+class RentsTab;
+} // namespace Frontend
 
 namespace Ui {
 class MainWindow;
@@ -22,8 +24,10 @@ public:
     void makeObjects();
 
 private:
-    Ui::MainWindow*                     ui;
-    QScopedPointer<Frontend::Equipment> mEquipment;
+    Ui::MainWindow*                      ui;
+    QScopedPointer<Frontend::Equipment>  mEquipment;
+    QScopedPointer<Frontend::ClientsTab> mClientsTab;
+    QScopedPointer<Frontend::RentsTab>   mRentsTab;
 };
 
 #endif // MAINWINDOW_H

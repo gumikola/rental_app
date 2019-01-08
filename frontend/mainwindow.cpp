@@ -1,5 +1,7 @@
 #include "mainwindow.h"
+#include "ClientsTab.h"
 #include "Equipment.h"
+#include "RentsTab.h"
 #include "ui_mainwindow.h"
 #include <QScopedPointer>
 
@@ -18,4 +20,6 @@ MainWindow::~MainWindow()
 void MainWindow::makeObjects()
 {
     mEquipment.reset(new Frontend::Equipment(ui));
+    mClientsTab.reset(new Frontend::ClientsTab(ui));
+    mRentsTab.reset(new Frontend::RentsTab(ui));
 }

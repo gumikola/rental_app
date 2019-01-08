@@ -20,9 +20,9 @@ Equipment::Equipment(Ui::MainWindow* ui)
     connect(ui->equipmentTabAddButton, SIGNAL(pressed()), this, SLOT(addEqPressed()));
     connect(ui->equipmentTable, SIGNAL(customContextMenuRequested(QPoint)), this,
             SLOT(displayMenu(QPoint)));
-    connect(ui->Rental, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(ui->RentalOffice, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     printDefaultTable();
-    fillEquipmentTypeComboBox();
+    Common::fillEquipmentTypeComboBox(mEquipmentType);
 }
 
 void Equipment::rentalChanged(int index)
@@ -149,11 +149,4 @@ void Equipment::printEquipment()
     }
 }
 
-void Equipment::fillEquipmentTypeComboBox()
-{
-    mEquipmentType.clear();
-
-    for (const auto e : Common::All)
-        mEquipmentType.addItem(Common::equipmentTypeToString(e));
-}
 } // namespace Frontend

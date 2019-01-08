@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ui_mainwindow.h"
 #include <QComboBox>
 #include <QObject>
@@ -7,7 +8,7 @@
 
 namespace Frontend {
 
-class Equipment : public QObject
+class RentsTab : public QObject
 {
     Q_OBJECT
 
@@ -15,21 +16,22 @@ class Equipment : public QObject
     QComboBox&      mRentalBox;
     QComboBox&      mEquipmentType;
     QTableWidget&   mTable;
-    QPushButton&    mAddEquipment;
+    QPushButton&    mAddHire;
 
     void printDefaultTable(void);
-    void printEquipment();
+    void printRents();
 
 public:
-    explicit Equipment(Ui::MainWindow* ui);
+    explicit RentsTab(Ui::MainWindow* ui);
 
 signals:
 
 public slots:
-    void rentalChanged(int);
-    void equipmentTypeChanged(int);
+    void rentalChanged(int index);
+    void equipmentTypeChanged(int index);
+    void addPressed();
     void displayMenu(QPoint pos);
-    void addEqPressed();
     void tabChanged(int);
 };
+
 } // namespace Frontend

@@ -30,18 +30,34 @@ SOURCES += \
     frontend/Equipment.cpp \
     backend/Database.cpp \
     frontend/AddEquipment.cpp \
-    common.cpp
+    common.cpp \
+    frontend/ClientsTab.cpp \
+    frontend/AddClient.cpp \
+    frontend/RentsTab.cpp \
+    frontend/AddHire.cpp \
+    frontend/ChooseEquipment.cpp \
+    frontend/ChooseClient.cpp
 
 HEADERS += \
     frontend/mainwindow.h \
     frontend/Equipment.h \
     backend/Database.h \
     common.h \
-    frontend/AddEquipment.h
+    frontend/AddEquipment.h \
+    frontend/ClientsTab.h \
+    frontend/AddClient.h \
+    frontend/RentsTab.h \
+    frontend/AddHire.h \
+    frontend/ChooseEquipment.h \
+    frontend/ChooseClient.h
 
 FORMS += \
         mainwindow.ui \
-    addequipment.ui
+    addequipment.ui \
+    addclient.ui \
+    addhire.ui \
+    chooseequipment.ui \
+    chooseclientwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

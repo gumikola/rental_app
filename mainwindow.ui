@@ -6,22 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>993</width>
-    <height>775</height>
+    <width>992</width>
+    <height>674</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTabWidget" name="Rental">
+   <widget class="QTabWidget" name="RentalOffice">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
       <width>991</width>
-      <height>721</height>
+      <height>621</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16777213</width>
+      <height>16777215</height>
+     </size>
     </property>
     <property name="font">
      <font>
@@ -30,7 +42,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="equipment">
      <attribute name="title">
@@ -42,7 +54,7 @@
         <x>10</x>
         <y>10</y>
         <width>971</width>
-        <height>671</height>
+        <height>571</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -82,6 +94,12 @@
          </item>
          <item>
           <widget class="QComboBox" name="equipmentRentalBox">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <family>Arial</family>
@@ -89,17 +107,17 @@
            </property>
            <item>
             <property name="text">
-             <string>Wybierz wyporzyczalnie</string>
+             <string>Wybierz wypożyczalnie</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>wyporzyczalnia 1</string>
+             <string>wypożyczalnia 1</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>wyporzyczalnia 2</string>
+             <string>wypożyczalnia 2</string>
             </property>
            </item>
           </widget>
@@ -115,6 +133,12 @@
           <widget class="QComboBox" name="equipmentType">
            <property name="enabled">
             <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
            </property>
            <property name="font">
             <font>
@@ -137,6 +161,12 @@
        </item>
        <item>
         <widget class="QPushButton" name="equipmentTabAddButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -168,8 +198,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>961</width>
-        <height>671</height>
+        <width>971</width>
+        <height>571</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -199,10 +229,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="equipmentTable_2"/>
+        <widget class="QTableWidget" name="ClientsTable"/>
        </item>
        <item>
-        <widget class="QPushButton" name="equipmentTabAddButton_2">
+        <widget class="QPushButton" name="ClientsAddButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -219,6 +255,145 @@
       </layout>
      </widget>
     </widget>
+    <widget class="QWidget" name="Rents">
+     <attribute name="title">
+      <string>   Wypożyczenia   </string>
+     </attribute>
+     <widget class="QWidget" name="verticalLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>971</width>
+        <height>571</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>20</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Aktualnie wypożyczone urządzenia</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="RentsTabRental">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+            </font>
+           </property>
+           <item>
+            <property name="text">
+             <string>Wybierz wypożyczalnie</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>wypożyczalnia 1</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>wypożyczalnia 2</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="RentsTabEquipmentType">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="RentsTabTable"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="RentsTabAddHire">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>16</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Dodaj urządzenie/sprzęt</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -226,7 +401,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>993</width>
+     <width>992</width>
      <height>21</height>
     </rect>
    </property>

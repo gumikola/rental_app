@@ -18,14 +18,12 @@ class AddEquipment : public QObject
     double                getPledge();
     uint                  getAmount();
 
-    void fillEquipmentTypeComboBox();
-
 public:
     AddEquipment();
 
 public slots:
-
     void addEquipmentPressed();
+    void cancelPressed();
 };
 
 } // namespace Frontend

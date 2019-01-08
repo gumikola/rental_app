@@ -12,8 +12,9 @@ AddEquipment::AddEquipment()
     : mUi(new Ui::AddEquipment)
 {
     mUi->setupUi(&mDialog);
-    fillEquipmentTypeComboBox();
+    Common::fillEquipmentTypeComboBox(*mUi->equipmentType);
     connect(mUi->addEquipmentButton, SIGNAL(pressed()), this, SLOT(addEquipmentPressed()));
+    connect(mUi->cancelButton, SIGNAL(pressed()), this, SLOT(cancelPressed()));
 
     mDialog.exec();
 }
@@ -109,11 +110,9 @@ void AddEquipment::addEquipmentPressed()
     }
 }
 
-void AddEquipment::fillEquipmentTypeComboBox()
+void AddEquipment::cancelPressed()
 {
-    mUi->equipmentType->clear();
-
-    for (const auto e : Common::All)
-        mUi->equipmentType->addItem(Common::equipmentTypeToString(e));
+    mDialog.close();
 }
+
 } // namespace Frontend
