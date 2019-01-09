@@ -8,7 +8,7 @@ QString equipmentTypeToString(const EquipmentType& type)
     switch (type)
     {
     case EquipmentType::None:
-        return QString("Wybierz typ elektronarzędzia");
+        return QString("Wybierz typ urządzenia");
 
     case EquipmentType::Elektronarzedzia:
         return QString("Elektronarzędzia");
