@@ -8,7 +8,16 @@ namespace Backend {
 
 Database::Database()
 {
+
+#ifdef __linux__
+    mDatabase.setHostName("192.168.0.137");
+    mDatabase.setDatabaseName("wypo");
+    mDatabase.setPort(5432);
+    mDatabase.setUserName("postgres");
+    mDatabase.setPassword("zaq12wsx");
+#elif _WIN32
     mDatabase.setDatabaseName("PostgreSQL35W");
+#endif
     if (mDatabase.open())
         qDebug("Database opened!");
 }
@@ -59,8 +68,7 @@ QVector<Common::ClientDetails> Database::getClients()
     return clients;
 }
 
-QVector<Common::EquipmentParameters> Database::getEquipment(const Common::EquipmentType& type,
-                                                            uint                         rental)
+QVector<Common::EquipmentParameters> Database::getEquipment(const Common::EquipmentType& type, uint rental)
 {
     qDebug("Database::getEquipment");
     QVector<Common::EquipmentParameters> eq;
@@ -122,13 +130,13 @@ QVector<Common::RentDetails> Database::getRents(const Common::EquipmentType type
             tmp.equipment.amount   = q.value("ilosc").toUInt();
             tmp.equipment.price    = q.value("cena").toDouble();
             tmp.equipment.pledge   = q.value("zastaw").toDouble();
-            tmp.equipment.type = static_cast<Common::EquipmentType>(q.value("typy_id").toUInt());
-            tmp.client.name    = q.value("imie").toString();
-            tmp.client.surname = q.value("nazwisko").toString();
-            tmp.client.adress  = q.value("adres").toString();
-            tmp.id             = q.value("id").toUInt();
-            tmp.rentDate       = q.value("data_wypozyczenia").toDateTime();
-            tmp.returnDate     = q.value("data_oddania").toDateTime();
+            tmp.equipment.type     = static_cast<Common::EquipmentType>(q.value("typy_id").toUInt());
+            tmp.client.name        = q.value("imie").toString();
+            tmp.client.surname     = q.value("nazwisko").toString();
+            tmp.client.adress      = q.value("adres").toString();
+            tmp.id                 = q.value("id").toUInt();
+            tmp.rentDate           = q.value("data_wypozyczenia").toDateTime();
+            tmp.returnDate         = q.value("data_oddania").toDateTime();
 
             rents.push_back(tmp);
         }
@@ -240,8 +248,7 @@ void Database::addHire(Common::RentDetails& hire)
         qDebug() << q.lastError();
 }
 
-void Database::editEquipment(const Common::EquipmentParameters& prev,
-                             const Common::EquipmentParameters& actual)
+void Database::editEquipment(const Common::EquipmentParameters& prev, const Common::EquipmentParameters& actual)
 {
     qDebug("Database %s", __func__);
 
@@ -313,8 +320,7 @@ void Database::editClient(const Common::ClientDetails& prev, const Common::Clien
         qDebug() << q.lastError();
 }
 
-void Database::addEquipment(const Common::EquipmentParameters& eq,
-                            const Common::EquipmentType&       type)
+void Database::addEquipment(const Common::EquipmentParameters& eq, const Common::EquipmentType& type)
 {
     qDebug("Database add equipment");
 
