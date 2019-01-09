@@ -105,7 +105,7 @@ void ClientsTab::printDefaultTable(void)
     for (int i = 0; i < columnCnt; i++)
     {
         if (i == 2)
-            mTable.setColumnWidth(i, mTable.width() / 2 - 4);
+            mTable.setColumnWidth(i, mTable.width() / 2 - 22);
         else
             mTable.setColumnWidth(i, (mTable.width() / 2) / (columnCnt - 1));
     }

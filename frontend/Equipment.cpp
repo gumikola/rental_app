@@ -156,7 +156,7 @@ void Equipment::printDefaultTable(void)
     for (int i = 0; i < columnCnt; i++)
     {
         if (i == 0 or i == 1)
-            mTable.setColumnWidth(i, mTable.width() / 4 - 4);
+            mTable.setColumnWidth(i, mTable.width() / 4 - 22);
         else
             mTable.setColumnWidth(i, (mTable.width() / 2) / (columnCnt - 2));
     }

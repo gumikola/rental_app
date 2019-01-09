@@ -86,7 +86,7 @@ void ChooseEquipment::printDefaultTable(void)
     for (int i = 0; i < columnCnt; i++)
     {
         if (i == 0 or i == 1)
-            mUi->table->setColumnWidth(i, mUi->table->width() / 4 - 4);
+            mUi->table->setColumnWidth(i, mUi->table->width() / 4 - 22);
         else
             mUi->table->setColumnWidth(i, (mUi->table->width() / 2) / (columnCnt - 2));
     }

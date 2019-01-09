@@ -46,7 +46,7 @@ void ChooseClient::printDefaultTable()
     for (int i = 0; i < columnCnt; i++)
     {
         if (i == 2)
-            mUi->table->setColumnWidth(i, mUi->table->width() / 2 - 4);
+            mUi->table->setColumnWidth(i, mUi->table->width() / 2 - 22);
         else
             mUi->table->setColumnWidth(i, (mUi->table->width() / 2) / (columnCnt - 1));
     }

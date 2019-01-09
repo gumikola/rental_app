@@ -110,7 +110,7 @@ void RentsTab::printDefaultTable(void)
     for (int i = 0; i < columnCnt; i++)
     {
         if (not i)
-            mTable.setColumnWidth(i, mTable.width() / 3 - 6);
+            mTable.setColumnWidth(i, mTable.width() / 3 - 24);
         else
             mTable.setColumnWidth(i, (mTable.width() - mTable.width() / 3) / (columnCnt - 1));
     }
