@@ -10,6 +10,10 @@ class ClientsTab;
 class RentsTab;
 } // namespace Frontend
 
+namespace Backend {
+class Database;
+}
+
 namespace Ui {
 class MainWindow;
 }
@@ -28,6 +32,7 @@ private:
     QScopedPointer<Frontend::Equipment>  mEquipment;
     QScopedPointer<Frontend::ClientsTab> mClientsTab;
     QScopedPointer<Frontend::RentsTab>   mRentsTab;
+    QScopedPointer<Backend::Database>    mDatabase;
 };
 
 #endif // MAINWINDOW_H

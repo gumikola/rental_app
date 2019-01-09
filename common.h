@@ -1,6 +1,9 @@
 #pragma once
 
+#include <QDateTime>
 #include <QString>
+
+#define RENTAL_ID 1
 
 class QComboBox;
 
@@ -19,12 +22,19 @@ static const EquipmentType All[] = {EquipmentType::None, EquipmentType::Elektron
                                     EquipmentType::SprzetBudowlany, EquipmentType::SprzetOgrodowy,
                                     EquipmentType::Transport};
 
+enum class Status
+{
+    Free,
+    Hired
+};
+
 struct EquipmentParameters
 {
     QString       name;
     double        price;
     double        pledge; // zastaw ;)
     uint          amount;
+    QString       producer;
     EquipmentType type;
 };
 
@@ -37,10 +47,11 @@ struct ClientDetails
 
 struct RentDetails
 {
-    QString equipmentName;
-    uint    amount;
-    QString name;
-    QString surname;
+    ClientDetails       client;
+    EquipmentParameters equipment;
+    QDateTime           rentDate;
+    QDateTime           returnDate;
+    uint                id;
 };
 
 QString equipmentTypeToString(const EquipmentType& type);

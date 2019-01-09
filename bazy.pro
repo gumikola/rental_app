@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,7 +36,9 @@ SOURCES += \
     frontend/RentsTab.cpp \
     frontend/AddHire.cpp \
     frontend/ChooseEquipment.cpp \
-    frontend/ChooseClient.cpp
+    frontend/ChooseClient.cpp \
+    frontend/EditClientDetails.cpp \
+    frontend/EditEquipment.cpp
 
 HEADERS += \
     frontend/mainwindow.h \
@@ -49,7 +51,9 @@ HEADERS += \
     frontend/RentsTab.h \
     frontend/AddHire.h \
     frontend/ChooseEquipment.h \
-    frontend/ChooseClient.h
+    frontend/ChooseClient.h \
+    frontend/EditClientDetails.h \
+    frontend/EditEquipment.h
 
 FORMS += \
         mainwindow.ui \
@@ -57,7 +61,9 @@ FORMS += \
     addclient.ui \
     addhire.ui \
     chooseequipment.ui \
-    chooseclientwindow.ui
+    chooseclientwindow.ui \
+    editclient.ui \
+    editequipment.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

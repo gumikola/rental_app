@@ -1,12 +1,15 @@
 #include "ChooseClient.h"
+#include "backend/Database.h"
 #include "ui_chooseclientwindow.h"
 #include <QDialog>
 #include <QMessageBox>
 
 namespace Frontend {
 
-ChooseClient::ChooseClient()
+ChooseClient::ChooseClient(Backend::Database& database)
     : mUi(new Ui::ChooseClientWindow)
+    , mDatabase(database)
+
 {
     mUi->setupUi(&mDialog);
     connect(mUi->addButton, SIGNAL(pressed()), this, SLOT(addPressed()));
@@ -16,20 +19,7 @@ ChooseClient::ChooseClient()
     mDialog.open();
 
     printDefaultTable();
-    fillClientsList();
     printFiltredClients(QString());
-}
-
-void ChooseClient::fillClientsList()
-{
-    for (uint i = 0; i < 7; i++)
-    {
-        Common::ClientDetails a;
-        a.name    = QString("Adam_") + QString::number(i);
-        a.surname = QString("Nowak_") + QString::number(i);
-        a.adress  = QString("Lotnicza " + QString::number(i));
-        mClients.push_back(a);
-    }
 }
 
 void ChooseClient::printDefaultTable()
@@ -64,11 +54,15 @@ void ChooseClient::printDefaultTable()
 
 void ChooseClient::printFiltredClients(const QString& filter)
 {
+    QVector<Common::ClientDetails> mClients = mDatabase.getClients();
+
     int rowCnt = 0;
+
     mUi->table->setRowCount(0);
     for (Common::ClientDetails client : mClients)
     {
-        if (client.surname.contains(filter))
+        if (client.surname.contains(
+                QRegularExpression(filter, QRegularExpression::CaseInsensitiveOption)))
         {
             int columnCnt = 0;
             mUi->table->insertRow(rowCnt);
@@ -102,8 +96,6 @@ void ChooseClient::addPressed()
         tmp.name    = mUi->table->item(row, 0)->text();
         tmp.surname = mUi->table->item(row, 1)->text();
         tmp.adress  = mUi->table->item(row, 2)->text();
-
-        // #TODO send struct to database
 
         emit clientChosed(tmp);
         mDialog.close();

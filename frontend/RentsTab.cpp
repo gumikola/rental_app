@@ -1,17 +1,17 @@
 #include "RentsTab.h"
 #include "AddHire.h"
+#include "backend/Database.h"
 #include "common.h"
 
 namespace Frontend {
 
-RentsTab::RentsTab(Ui::MainWindow* ui)
+RentsTab::RentsTab(Ui::MainWindow* ui, Backend::Database& database)
     : mUi(ui)
-    , mRentalBox(*ui->RentsTabRental)
     , mEquipmentType(*ui->RentsTabEquipmentType)
     , mTable(*ui->RentsTabTable)
     , mAddHire(*ui->RentsTabAddHire)
+    , mDatabase(database)
 {
-    connect(ui->RentsTabRental, SIGNAL(activated(int)), this, SLOT(rentalChanged(int)));
     connect(ui->RentsTabEquipmentType, SIGNAL(activated(int)), this,
             SLOT(equipmentTypeChanged(int)));
     connect(ui->RentsTabAddHire, SIGNAL(pressed()), this, SLOT(addPressed()));
@@ -21,21 +21,6 @@ RentsTab::RentsTab(Ui::MainWindow* ui)
 
     printDefaultTable();
     Common::fillEquipmentTypeComboBox(mEquipmentType);
-}
-
-void RentsTab::rentalChanged(int index)
-{
-    qDebug("rentalChanged to: %d", index);
-    if (index)
-    {
-        mEquipmentType.setEnabled(true);
-    }
-    else
-    {
-        mEquipmentType.setEnabled(false);
-        mEquipmentType.setCurrentIndex(0);
-        printDefaultTable();
-    }
 }
 
 void RentsTab::equipmentTypeChanged(int index)
@@ -56,7 +41,9 @@ void RentsTab::addPressed()
 {
     qDebug("addPressed()");
 
-    AddHire window;
+    AddHire window(mDatabase);
+
+    printRents();
 }
 
 void RentsTab::displayMenu(QPoint pos)
@@ -64,24 +51,43 @@ void RentsTab::displayMenu(QPoint pos)
     qDebug("displayMenu requested");
     QMenu menu(&(mTable));
 
-    QAction* remove = menu.addAction("Usun");
-    QAction* edit   = menu.addAction("Edytuj");
-    QAction* a      = menu.exec(mUi->equipmentTable->viewport()->mapToGlobal(pos));
+    QAction* completed = menu.addAction("Oznacz jako zakonczone");
+    QAction* remove    = menu.addAction("Usun");
+    QAction* a         = menu.exec(mUi->equipmentTable->viewport()->mapToGlobal(pos));
     if (a == remove)
     {
         int row = mTable.currentRow();
         qDebug("remove choosed row index=%d", row);
+
+        Common::RentDetails tmp;
+        //        tmp.equipmentName = mTable.item(row, 0)->text();
+        //        tmp.amount        = mTable.item(row, 1)->text().toUInt();
+        //        tmp.name          = mTable.item(row, 2)->text();
+        //        tmp.surname       = mTable.item(row, 3)->text();
+
+        mDatabase.removeHire(tmp);
+
+        // nazwa ilosc imie nazisko
     }
-    if (a == edit)
+    if (a == completed)
     {
         int row = mTable.currentRow();
-        qDebug("edit choosed row index=%d", row);
+        qDebug("closed choosed row index=%d", row);
+
+        Common::RentDetails tmp;
+        //        tmp.equipmentName = mTable.item(row, 0)->text();
+        //        tmp.amount        = mTable.item(row, 1)->text().toUInt();
+        //        tmp.name          = mTable.item(row, 2)->text();
+        //        tmp.surname       = mTable.item(row, 3)->text();
+
+        mDatabase.markAsCompleted(tmp);
     }
 }
 
 void RentsTab::tabChanged(int)
 {
     printDefaultTable();
+    printRents();
 }
 
 void RentsTab::printDefaultTable(void)
@@ -97,36 +103,33 @@ void RentsTab::printDefaultTable(void)
     mTable.setRowCount(0);
 
     mTable.insertColumn(columnCnt);
-    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Nazwa narzędzia"));
+    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Data\nwypożyczenia"));
 
     mTable.insertColumn(columnCnt);
-    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Ilość"));
+    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Typ\nurządzenia"));
 
     mTable.insertColumn(columnCnt);
-    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Imie"));
+    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Nazwa\nurządzenia"));
+
+    mTable.insertColumn(columnCnt);
+    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Imię"));
 
     mTable.insertColumn(columnCnt);
     mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Nazwisko"));
 
     for (int i = 0; i < columnCnt; i++)
     {
-        mTable.setColumnWidth(i, mTable.width() / columnCnt - 2);
+        if (not i)
+            mTable.setColumnWidth(i, mTable.width() / 3 - 6);
+        else
+            mTable.setColumnWidth(i, (mTable.width() - mTable.width() / 3) / (columnCnt - 1));
     }
 }
 
 void RentsTab::printRents()
 {
-    QVector<Common::RentDetails> rents; // mDataBaseApi.getOrdersByDate(mSelectedDate);
-
-    for (uint i = 0; i < 7; i++)
-    {
-        Common::RentDetails a;
-        a.amount        = i;
-        a.equipmentName = QString("wiertnica");
-        a.name          = QString("Jan_" + QString::number(i));
-        a.surname       = QString("Kowalski_" + QString::number(i));
-        rents.push_back(a);
-    }
+    QVector<Common::RentDetails> rents =
+        mDatabase.getRents(static_cast<Common::EquipmentType>(mEquipmentType.currentIndex()));
 
     int rowCnt = 0;
     mTable.setRowCount(0);
@@ -135,10 +138,12 @@ void RentsTab::printRents()
         int columnCnt = 0;
         mTable.insertRow(rowCnt);
         mTable.setVerticalHeaderItem(rowCnt, new QTableWidgetItem());
-        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(rent.equipmentName));
-        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(rent.amount)));
-        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString(rent.name)));
-        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString(rent.surname)));
+        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(rent.rentDate.toString()));
+        mTable.setItem(rowCnt, columnCnt++,
+                       new QTableWidgetItem(Common::equipmentTypeToString(rent.equipment.type)));
+        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(rent.equipment.name));
+        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(rent.client.name));
+        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(rent.client.surname));
 
         rowCnt++;
     }

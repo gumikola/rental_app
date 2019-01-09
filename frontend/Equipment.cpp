@@ -1,5 +1,6 @@
 #include "Equipment.h"
 #include "AddEquipment.h"
+#include "EditEquipment.h"
 #include "backend/Database.h"
 #include "common.h"
 #include "ui_addequipment.h"
@@ -8,12 +9,13 @@
 
 namespace Frontend {
 
-Equipment::Equipment(Ui::MainWindow* ui)
+Equipment::Equipment(Ui::MainWindow* ui, Backend::Database& database)
     : mUi(ui)
     , mRentalBox(*ui->equipmentRentalBox)
     , mEquipmentType(*ui->equipmentType)
     , mTable(*ui->equipmentTable)
     , mAddEquipment(*ui->equipmentTabAddButton)
+    , mDatabase(database)
 {
     connect(ui->equipmentRentalBox, SIGNAL(activated(int)), this, SLOT(rentalChanged(int)));
     connect(ui->equipmentType, SIGNAL(activated(int)), this, SLOT(equipmentTypeChanged(int)));
@@ -22,6 +24,8 @@ Equipment::Equipment(Ui::MainWindow* ui)
             SLOT(displayMenu(QPoint)));
     connect(ui->RentalOffice, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     printDefaultTable();
+    connect(mUi->EquipmentTabNameFiltr, SIGNAL(textChanged(const QString&)), this,
+            SLOT(filterChanged(const QString&)));
     Common::fillEquipmentTypeComboBox(mEquipmentType);
 }
 
@@ -31,6 +35,9 @@ void Equipment::rentalChanged(int index)
     if (index)
     {
         mEquipmentType.setEnabled(true);
+        if (mRentalBox.currentIndex() >= 0)
+            printEquipment(static_cast<Common::EquipmentType>(mEquipmentType.currentIndex()),
+                           static_cast<uint>(mUi->equipmentRentalBox->currentIndex()));
     }
     else
     {
@@ -46,7 +53,8 @@ void Equipment::equipmentTypeChanged(int index)
     if (index)
     {
         // get data from database and display table
-        printEquipment();
+        printEquipment(static_cast<Common::EquipmentType>(index),
+                       static_cast<uint>(mUi->equipmentRentalBox->currentIndex()));
     }
     else
     {
@@ -56,34 +64,65 @@ void Equipment::equipmentTypeChanged(int index)
 
 void Equipment::displayMenu(QPoint pos)
 {
-    qDebug("No siem jestem");
     QMenu menu(&(mTable));
 
-    QAction* remove       = menu.addAction("Usun");
-    QAction* changeAmount = menu.addAction("Zmien ilosc");
-    QAction* a            = menu.exec(mUi->equipmentTable->viewport()->mapToGlobal(pos));
+    QAction* remove = menu.addAction("Usun");
+    QAction* edit   = menu.addAction("Edytuj");
+    QAction* a      = menu.exec(mUi->equipmentTable->viewport()->mapToGlobal(pos));
     if (a == remove)
     {
         int row = mTable.currentRow();
         qDebug("remove choosed row index=%d", row);
+
+        Common::EquipmentParameters tmp;
+        tmp.producer = mTable.item(row, 0)->text();
+        tmp.name     = mTable.item(row, 1)->text();
+        tmp.price    = mTable.item(row, 2)->text().toDouble();
+        tmp.pledge   = mTable.item(row, 3)->text().toDouble();
+        tmp.amount   = mTable.item(row, 4)->text().toUInt();
+        tmp.type     = static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex());
+        mDatabase.removeEquipment(tmp);
+        printEquipment(static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex()),
+                       static_cast<uint>(mUi->equipmentRentalBox->currentIndex()));
     }
-    if (a == changeAmount)
+    if (a == edit)
     {
         int row = mTable.currentRow();
-        qDebug("changeAmount choosed row index=%d", row);
+        qDebug("edit choosed row index=%d", row);
+
+        Common::EquipmentParameters tmp;
+        tmp.producer = mTable.item(row, 0)->text();
+        tmp.name     = mTable.item(row, 1)->text();
+        tmp.price    = mTable.item(row, 2)->text().toDouble();
+        tmp.pledge   = mTable.item(row, 3)->text().toDouble();
+        tmp.amount   = mTable.item(row, 4)->text().toUInt();
+        tmp.type     = static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex());
+
+        EditEquipment window(mDatabase, tmp);
+        window.exec();
+        printEquipment(static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex()),
+                       static_cast<uint>(mUi->equipmentRentalBox->currentIndex()));
     }
 }
 
 void Equipment::addEqPressed()
 {
     qDebug("addEqPressed()");
+    AddEquipment window(mDatabase);
 
-    AddEquipment window;
+    printEquipment(static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex()),
+                   static_cast<uint>(mUi->equipmentRentalBox->currentIndex()));
 }
 
 void Equipment::tabChanged(int)
 {
     printDefaultTable();
+}
+
+void Equipment::filterChanged(const QString& text)
+{
+    qDebug("%s zmieniono na: %s", __func__, text.toStdString().c_str());
+    printFiltredEquipment(text);
 }
 
 void Equipment::printDefaultTable(void)
@@ -99,6 +138,9 @@ void Equipment::printDefaultTable(void)
     mTable.setRowCount(0);
 
     mTable.insertColumn(columnCnt);
+    mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Producent"));
+
+    mTable.insertColumn(columnCnt);
     mTable.setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Nazwa"));
 
     mTable.insertColumn(columnCnt);
@@ -112,26 +154,22 @@ void Equipment::printDefaultTable(void)
 
     for (int i = 0; i < columnCnt; i++)
     {
-        if (not i)
-            mTable.setColumnWidth(i, mTable.width() / 2 - 4);
+        if (i == 0 or i == 1)
+            mTable.setColumnWidth(i, mTable.width() / 4 - 4);
         else
-            mTable.setColumnWidth(i, (mTable.width() / 2) / (columnCnt - 1));
+            mTable.setColumnWidth(i, (mTable.width() / 2) / (columnCnt - 2));
     }
 }
 
-void Equipment::printEquipment()
+void Equipment::printEquipment(const Common::EquipmentType& type, uint rental_id)
 {
-    QVector<Common::EquipmentParameters> equipment; // mDataBaseApi.getOrdersByDate(mSelectedDate);
-
-    for (uint i = 0; i < 7; i++)
+    if (not rental_id)
     {
-        Common::EquipmentParameters a;
-        a.name   = QString("narzedzie") + QString::number(i);
-        a.price  = 12;
-        a.pledge = 100;
-        a.amount = i + 2;
-        equipment.push_back(a);
+        printDefaultTable();
+        return;
     }
+
+    QVector<Common::EquipmentParameters> equipment = mDatabase.getEquipment(type, rental_id);
 
     int rowCnt = 0;
     mTable.setRowCount(0);
@@ -140,12 +178,39 @@ void Equipment::printEquipment()
         int columnCnt = 0;
         mTable.insertRow(rowCnt);
         mTable.setVerticalHeaderItem(rowCnt, new QTableWidgetItem());
+        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.producer));
         mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.name));
         mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.price)));
         mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.pledge)));
         mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.amount)));
 
         rowCnt++;
+    }
+}
+
+void Equipment::printFiltredEquipment(const QString& filter)
+{
+    QVector<Common::EquipmentParameters> equipment =
+        mDatabase.getEquipment(static_cast<Common::EquipmentType>(mEquipmentType.currentIndex()),
+                               static_cast<uint>(mUi->equipmentRentalBox->currentIndex()));
+
+    int rowCnt = 0;
+    mTable.setRowCount(0);
+    for (Common::EquipmentParameters eq : equipment)
+    {
+        if (eq.name.contains(QRegularExpression(filter, QRegularExpression::CaseInsensitiveOption)))
+        {
+            int columnCnt = 0;
+            mTable.insertRow(rowCnt);
+            mTable.setVerticalHeaderItem(rowCnt, new QTableWidgetItem());
+            mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.producer));
+            mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.name));
+            mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.price)));
+            mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.pledge)));
+            mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.amount)));
+
+            rowCnt++;
+        }
     }
 }
 

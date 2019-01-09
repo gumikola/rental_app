@@ -4,14 +4,21 @@
 #include "ui_addhire.h"
 #include <QObject>
 
+namespace Backend {
+class Database;
+} // namespace Backend
+
 namespace Frontend {
 
 class AddHire : public QObject
 {
     Q_OBJECT
 
-    Ui::hireEquipment* mUi;
-    QDialog            mDialog;
+    Ui::hireEquipment*          mUi;
+    QDialog                     mDialog;
+    Backend::Database&          mDatabase;
+    Common::ClientDetails       mChosenClient;
+    Common::EquipmentParameters mChosenEq;
 
     void printDefaultEquipmentTable(void);
     void printDefaultClientTable(void);
@@ -19,7 +26,7 @@ class AddHire : public QObject
     void printEquipment(Common::EquipmentParameters& eq);
 
 public:
-    explicit AddHire();
+    explicit AddHire(Backend::Database& database);
 
 signals:
 

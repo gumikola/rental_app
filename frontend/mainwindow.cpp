@@ -4,6 +4,7 @@
 #include "RentsTab.h"
 #include "ui_mainwindow.h"
 #include <QScopedPointer>
+#include <backend/Database.h>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -19,7 +20,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::makeObjects()
 {
-    mEquipment.reset(new Frontend::Equipment(ui));
-    mClientsTab.reset(new Frontend::ClientsTab(ui));
-    mRentsTab.reset(new Frontend::RentsTab(ui));
+    mDatabase.reset(new Backend::Database());
+    mEquipment.reset(new Frontend::Equipment(ui, *mDatabase.get()));
+    mClientsTab.reset(new Frontend::ClientsTab(ui, *mDatabase.get()));
+    mRentsTab.reset(new Frontend::RentsTab(ui, *mDatabase.get()));
 }

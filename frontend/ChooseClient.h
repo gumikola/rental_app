@@ -4,22 +4,26 @@
 #include "ui_chooseclientwindow.h"
 #include <QObject>
 
+namespace Backend {
+class Database;
+} // namespace Backend
+
 namespace Frontend {
 
 class ChooseClient : public QObject
 {
     Q_OBJECT
 
-    Ui::ChooseClientWindow*        mUi;
-    QDialog                        mDialog;
-    QVector<Common::ClientDetails> mClients;
+    Ui::ChooseClientWindow* mUi;
+    QDialog                 mDialog;
+    Backend::Database&      mDatabase;
 
-    void fillClientsList(void);
+    //    void fillClientsList(void);
     void printDefaultTable(void);
     void printFiltredClients(const QString& filter);
 
 public:
-    explicit ChooseClient();
+    explicit ChooseClient(Backend::Database& database);
     void exec();
 
 signals:

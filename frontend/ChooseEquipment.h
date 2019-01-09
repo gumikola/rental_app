@@ -5,6 +5,10 @@
 #include <QDialog>
 #include <QObject>
 
+namespace Backend {
+class Database;
+} // namespace Backend
+
 namespace Frontend {
 
 class ChooseEquipment : public QObject
@@ -13,12 +17,13 @@ class ChooseEquipment : public QObject
 
     Ui::ChooseEquipment* mUi;
     QDialog              mDialog;
+    Backend::Database&   mDatabase;
 
     void printDefaultTable(void);
     void printEquipment();
 
 public:
-    explicit ChooseEquipment();
+    explicit ChooseEquipment(Backend::Database& database);
     void exec();
 
 signals:

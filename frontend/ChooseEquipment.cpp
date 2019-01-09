@@ -1,10 +1,12 @@
 #include "ChooseEquipment.h"
+#include "backend/Database.h"
 #include <QMessageBox>
 
 namespace Frontend {
 
-ChooseEquipment::ChooseEquipment()
+ChooseEquipment::ChooseEquipment(Backend::Database& database)
     : mUi(new Ui::ChooseEquipment)
+    , mDatabase(database)
 {
     mUi->setupUi(&mDialog);
 
@@ -12,8 +14,8 @@ ChooseEquipment::ChooseEquipment()
     connect(mUi->addButton, SIGNAL(pressed()), this, SLOT(addPressed()));
     connect(mUi->equipmentType, SIGNAL(activated(int)), this, SLOT(equipmentTypeChanged(int)));
     Common::fillEquipmentTypeComboBox(*mUi->equipmentType);
-    printDefaultTable();
     mDialog.open();
+    printDefaultTable();
 }
 
 void ChooseEquipment::exec()
@@ -30,18 +32,20 @@ void ChooseEquipment::addPressed()
     try
     {
 
-        if (row <= 0)
+        if (row < 0)
             throw QString("Nie wybrano urządzenia/sprzętu");
+
         if (mUi->equipmentType->currentIndex() <= 0)
             throw QString("Nie wybrano typu sprzętu");
 
         Common::EquipmentParameters tmp;
 
-        tmp.amount = 1;
-        tmp.name   = mUi->table->item(row, 0)->text();
-        tmp.price  = mUi->table->item(row, 1)->text().toDouble();
-        tmp.pledge = mUi->table->item(row, 2)->text().toDouble();
-        tmp.type   = static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex());
+        tmp.amount   = 1;
+        tmp.producer = mUi->table->item(row, 0)->text();
+        tmp.name     = mUi->table->item(row, 1)->text();
+        tmp.price    = mUi->table->item(row, 2)->text().toDouble();
+        tmp.pledge   = mUi->table->item(row, 3)->text().toDouble();
+        tmp.type     = static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex());
 
         emit equipmentChosen(tmp);
         mDialog.close();
@@ -74,6 +78,9 @@ void ChooseEquipment::printDefaultTable(void)
     mUi->table->setRowCount(0);
 
     mUi->table->insertColumn(columnCnt);
+    mUi->table->setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Producent"));
+
+    mUi->table->insertColumn(columnCnt);
     mUi->table->setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Nazwa"));
 
     mUi->table->insertColumn(columnCnt);
@@ -87,26 +94,17 @@ void ChooseEquipment::printDefaultTable(void)
 
     for (int i = 0; i < columnCnt; i++)
     {
-        if (not i)
-            mUi->table->setColumnWidth(i, mUi->table->width() / 2 - 4);
+        if (i == 0 or i == 1)
+            mUi->table->setColumnWidth(i, mUi->table->width() / 4 - 4);
         else
-            mUi->table->setColumnWidth(i, (mUi->table->width() / 2) / (columnCnt - 1));
+            mUi->table->setColumnWidth(i, (mUi->table->width() / 2) / (columnCnt - 2));
     }
 }
 
 void ChooseEquipment::printEquipment()
 {
-    QVector<Common::EquipmentParameters> equipment; // mDataBaseApi.getOrdersByDate(mSelectedDate);
-
-    for (uint i = 0; i < 7; i++)
-    {
-        Common::EquipmentParameters a;
-        a.name   = QString("narzedzie") + QString::number(i);
-        a.price  = 12;
-        a.pledge = 100;
-        a.amount = i + 2;
-        equipment.push_back(a);
-    }
+    QVector<Common::EquipmentParameters> equipment = mDatabase.getEquipment(
+        static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex()), RENTAL_ID);
 
     int rowCnt = 0;
     mUi->table->setRowCount(0);
@@ -115,6 +113,7 @@ void ChooseEquipment::printEquipment()
         int columnCnt = 0;
         mUi->table->insertRow(rowCnt);
         mUi->table->setVerticalHeaderItem(rowCnt, new QTableWidgetItem());
+        mUi->table->setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.producer));
         mUi->table->setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.name));
         mUi->table->setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.price)));
         mUi->table->setItem(rowCnt, columnCnt++, new QTableWidgetItem(QString::number(eq.pledge)));

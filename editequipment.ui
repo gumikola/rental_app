@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AddEquipment</class>
- <widget class="QDialog" name="AddEquipment">
+ <class>EditEquipment</class>
+ <widget class="QDialog" name="EditEquipment">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>570</width>
-    <height>320</height>
+    <width>569</width>
+    <height>298</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>20</x>
      <y>10</y>
      <width>527</width>
-     <height>296</height>
+     <height>281</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -40,7 +40,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Dodawanie urządzenia</string>
+       <string>Edytuj urządzenie</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -208,17 +208,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_13">
+       <widget class="QLabel" name="label_8">
         <property name="minimumSize">
          <size>
           <width>30</width>
           <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>30</width>
-          <height>16777215</height>
          </size>
         </property>
         <property name="font">
@@ -436,7 +430,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QPushButton" name="addEquipmentButton">
+       <widget class="QPushButton" name="saveButton">
         <property name="font">
          <font>
           <family>Arial</family>
@@ -446,7 +440,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Dodaj</string>
+         <string>Zapisz</string>
         </property>
        </widget>
       </item>

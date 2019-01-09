@@ -1,26 +1,29 @@
-#include "AddClient.h"
+#include "EditClientDetails.h"
 #include "backend/Database.h"
 #include <QDialog>
 #include <QMessageBox>
 
 namespace Frontend {
 
-AddClient::AddClient(Backend::Database& database)
-    : mUi(new Ui::AddClientWindow)
+EditClientDetails::EditClientDetails(const Common::ClientDetails& client,
+                                     Backend::Database&           database)
+    : mUi(new Ui::EditClient)
+    , mPreClient(client)
     , mDatabase(database)
 {
     mUi->setupUi(&mDialog);
-    connect(mUi->addButton, SIGNAL(pressed()), this, SLOT(addPressed()));
+    connect(mUi->saveButton, SIGNAL(pressed()), this, SLOT(savePressed()));
     connect(mUi->cancelButton, SIGNAL(pressed()), this, SLOT(cancelPressed()));
+    fillWindowClientData(client);
     mDialog.open();
 }
 
-void AddClient::exec()
+void EditClientDetails::exec()
 {
     mDialog.exec();
 }
 
-void AddClient::addPressed()
+void EditClientDetails::savePressed()
 {
     qDebug("addPressed()");
     try
@@ -30,8 +33,7 @@ void AddClient::addPressed()
         tmp.surname = getSurname();
         tmp.adress  = getAddress();
 
-        mDatabase.addClient(tmp);
-        emit clientAdded(tmp);
+        mDatabase.editClient(mPreClient, tmp);
 
         mDialog.close();
     }
@@ -44,12 +46,12 @@ void AddClient::addPressed()
     }
 }
 
-void AddClient::cancelPressed()
+void EditClientDetails::cancelPressed()
 {
     mDialog.close();
 }
 
-QString AddClient::getName()
+QString EditClientDetails::getName()
 {
     QString tmp = mUi->name->text();
 
@@ -59,7 +61,7 @@ QString AddClient::getName()
     return tmp;
 }
 
-QString AddClient::getSurname()
+QString EditClientDetails::getSurname()
 {
     QString tmp = mUi->surname->text();
 
@@ -69,7 +71,7 @@ QString AddClient::getSurname()
     return tmp;
 }
 
-QString AddClient::getAddress()
+QString EditClientDetails::getAddress()
 {
     QString tmp = mUi->adress->text();
 
@@ -79,4 +81,10 @@ QString AddClient::getAddress()
     return tmp;
 }
 
+void EditClientDetails::fillWindowClientData(const Common::ClientDetails& client)
+{
+    mUi->name->setText(client.name);
+    mUi->surname->setText(client.surname);
+    mUi->adress->setText(client.adress);
+}
 } // namespace Frontend

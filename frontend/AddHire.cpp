@@ -2,14 +2,17 @@
 #include "AddClient.h"
 #include "ChooseClient.h"
 #include "ChooseEquipment.h"
+#include "backend/Database.h"
+#include <QDateTime>
 #include <QDebug>
 #include <QDialog>
 #include <QMessageBox>
 
 namespace Frontend {
 
-AddHire::AddHire()
+AddHire::AddHire(Backend::Database& database)
     : mUi(new Ui::hireEquipment)
+    , mDatabase(database)
 {
     mUi->setupUi(&mDialog);
 
@@ -31,7 +34,7 @@ AddHire::AddHire()
 void AddHire::chooseClientFromDatabasePressed()
 {
     qDebug("%s", __func__);
-    ChooseClient window;
+    ChooseClient window(mDatabase);
     connect(&window, SIGNAL(clientChosed(Common::ClientDetails&)), this,
             SLOT(clientChoosed(Common::ClientDetails&)));
     window.exec();
@@ -40,7 +43,7 @@ void AddHire::chooseClientFromDatabasePressed()
 void AddHire::addNewClientPressed()
 {
     qDebug("%s", __func__);
-    AddClient window;
+    AddClient window(mDatabase);
 
     connect(&window, SIGNAL(clientAdded(Common::ClientDetails&)), this,
             SLOT(clientChoosed(Common::ClientDetails&)));
@@ -51,7 +54,7 @@ void AddHire::addNewClientPressed()
 void AddHire::chooseEquipmentPressed()
 {
     qDebug("%s", __func__);
-    ChooseEquipment window;
+    ChooseEquipment window(mDatabase);
     connect(&window, SIGNAL(equipmentChosen(Common::EquipmentParameters&)), this,
             SLOT(equipmentChosen(Common::EquipmentParameters&)));
     window.exec();
@@ -60,7 +63,30 @@ void AddHire::chooseEquipmentPressed()
 void AddHire::hirePressed()
 {
     qDebug("%s", __func__);
-    mDialog.close();
+    try
+    {
+        if (mUi->choosenClientTable->rowCount() == 0)
+            throw QString("Nie wybrano klienta");
+        if (mUi->choosenEquipmentTable->rowCount() == 0)
+            throw QString("Nie wybrano urządzenia");
+
+        Common::RentDetails tmp;
+        tmp.client     = mChosenClient;
+        tmp.equipment  = mChosenEq;
+        tmp.rentDate   = QDateTime::currentDateTime();
+        tmp.returnDate = QDateTime();
+
+        mDatabase.addHire(tmp);
+
+        mDialog.close();
+    }
+    catch (QString& e)
+    {
+        QMessageBox msgBox;
+        msgBox.setFont(QFont(QString("Arial"), 14));
+        msgBox.setText(e);
+        msgBox.exec();
+    }
 }
 
 void AddHire::cancelPressed()
@@ -72,7 +98,7 @@ void AddHire::cancelPressed()
 void AddHire::clientChoosed(Common::ClientDetails& client)
 {
     qDebug("%s", __func__);
-
+    mChosenClient = client;
     printChoosenClient(client);
 }
 
@@ -84,6 +110,7 @@ void AddHire::printEquipment(Common::EquipmentParameters& eq)
     int columnCnt = 0;
     mUi->choosenEquipmentTable->insertRow(rowCnt);
     mUi->choosenEquipmentTable->setVerticalHeaderItem(rowCnt, new QTableWidgetItem());
+    mUi->choosenEquipmentTable->setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.producer));
     mUi->choosenEquipmentTable->setItem(rowCnt, columnCnt++, new QTableWidgetItem(eq.name));
     mUi->choosenEquipmentTable->setItem(rowCnt, columnCnt++,
                                         new QTableWidgetItem(QString::number(eq.price)));
@@ -94,6 +121,9 @@ void AddHire::printEquipment(Common::EquipmentParameters& eq)
 void AddHire::equipmentChosen(Common::EquipmentParameters& eq)
 {
     qDebug("%s", __func__);
+
+    mChosenEq = eq;
+
     printEquipment(eq);
 }
 
@@ -125,6 +155,10 @@ void AddHire::printDefaultEquipmentTable(void)
     mUi->choosenEquipmentTable->setRowCount(0);
 
     mUi->choosenEquipmentTable->insertColumn(columnCnt);
+    mUi->choosenEquipmentTable->setHorizontalHeaderItem(columnCnt++,
+                                                        new QTableWidgetItem("Producent"));
+
+    mUi->choosenEquipmentTable->insertColumn(columnCnt);
     mUi->choosenEquipmentTable->setHorizontalHeaderItem(columnCnt++, new QTableWidgetItem("Nazwa"));
 
     mUi->choosenEquipmentTable->insertColumn(columnCnt);
@@ -136,12 +170,12 @@ void AddHire::printDefaultEquipmentTable(void)
 
     for (int i = 0; i < columnCnt; i++)
     {
-        if (not i)
+        if (i == 0 or i == 1)
             mUi->choosenEquipmentTable->setColumnWidth(i,
-                                                       mUi->choosenEquipmentTable->width() / 2 - 6);
+                                                       mUi->choosenEquipmentTable->width() / 4 - 6);
         else
             mUi->choosenEquipmentTable->setColumnWidth(
-                i, (mUi->choosenEquipmentTable->width() / 2) / (columnCnt - 1));
+                i, (mUi->choosenEquipmentTable->width() / 2) / (columnCnt - 2));
     }
 }
 

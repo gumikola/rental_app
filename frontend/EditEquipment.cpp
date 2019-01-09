@@ -1,26 +1,26 @@
-#include "AddEquipment.h"
+#include "EditEquipment.h"
 #include "backend/Database.h"
-#include <QComboBox>
-#include <QDialog>
 #include <QMessageBox>
-#include <QObject>
-#include <QPushButton>
 
 namespace Frontend {
 
-AddEquipment::AddEquipment(Backend::Database& database)
-    : mUi(new Ui::AddEquipment)
+EditEquipment::EditEquipment(Backend::Database&           database,
+                             Common::EquipmentParameters& choosenEquipment)
+    : mUi(new Ui::EditEquipment)
     , mDatabase(database)
+    , mEquipment(choosenEquipment)
 {
     mUi->setupUi(&mDialog);
     Common::fillEquipmentTypeComboBox(*mUi->equipmentType);
-    connect(mUi->addEquipmentButton, SIGNAL(pressed()), this, SLOT(addEquipmentPressed()));
+    connect(mUi->saveButton, SIGNAL(pressed()), this, SLOT(savePressed()));
     connect(mUi->cancelButton, SIGNAL(pressed()), this, SLOT(cancelPressed()));
 
-    mDialog.exec();
+    mDialog.open();
+
+    fillWidowData();
 }
 
-Common::EquipmentType AddEquipment::getEquipmentType()
+Common::EquipmentType EditEquipment::getEquipmentType()
 {
     if (not mUi->equipmentType->currentIndex())
         throw QString("Nie wybrano typu urządzenia!");
@@ -28,7 +28,7 @@ Common::EquipmentType AddEquipment::getEquipmentType()
     return static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex());
 }
 
-QString AddEquipment::getName()
+QString EditEquipment::getName()
 {
     QString tmp = mUi->name->text();
 
@@ -38,7 +38,7 @@ QString AddEquipment::getName()
     return tmp;
 }
 
-QString AddEquipment::getProducer()
+QString EditEquipment::getProducer()
 {
     QString tmp = mUi->producer->text();
 
@@ -48,7 +48,7 @@ QString AddEquipment::getProducer()
     return tmp;
 }
 
-double AddEquipment::getPrice()
+double EditEquipment::getPrice()
 {
     QString tmp = mUi->Price->text();
 
@@ -64,7 +64,7 @@ double AddEquipment::getPrice()
     return price;
 }
 
-double AddEquipment::getPledge()
+double EditEquipment::getPledge()
 {
     QString tmp = mUi->pledge->text();
 
@@ -80,7 +80,7 @@ double AddEquipment::getPledge()
     return pledge;
 }
 
-uint AddEquipment::getAmount()
+uint EditEquipment::getAmount()
 {
     QString tmp = mUi->amount->text();
 
@@ -96,7 +96,17 @@ uint AddEquipment::getAmount()
     return amount;
 }
 
-void AddEquipment::addEquipmentPressed()
+void EditEquipment::fillWidowData()
+{
+    mUi->producer->setText(mEquipment.producer);
+    mUi->name->setText(mEquipment.name);
+    mUi->Price->setText(QString::number(mEquipment.price));
+    mUi->pledge->setText(QString::number(mEquipment.pledge));
+    mUi->amount->setText(QString::number(mEquipment.amount));
+    mUi->equipmentType->setCurrentIndex(static_cast<int>(mEquipment.type));
+}
+
+void EditEquipment::savePressed()
 {
     qDebug("addEquipmentPressed");
     try
@@ -109,8 +119,7 @@ void AddEquipment::addEquipmentPressed()
         tmp.amount   = getAmount();
         tmp.producer = getProducer();
 
-        mDatabase.addEquipment(
-            tmp, static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex()));
+        mDatabase.editEquipment(mEquipment, tmp);
 
         mDialog.close();
     }
@@ -123,9 +132,14 @@ void AddEquipment::addEquipmentPressed()
     }
 }
 
-void AddEquipment::cancelPressed()
+void EditEquipment::cancelPressed()
 {
     mDialog.close();
+}
+
+void EditEquipment::exec()
+{
+    mDialog.exec();
 }
 
 } // namespace Frontend
