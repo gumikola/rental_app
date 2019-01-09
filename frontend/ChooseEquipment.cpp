@@ -38,16 +38,7 @@ void ChooseEquipment::addPressed()
         if (mUi->equipmentType->currentIndex() <= 0)
             throw QString("Nie wybrano typu sprzętu");
 
-        Common::EquipmentParameters tmp;
-
-        tmp.amount   = 1;
-        tmp.producer = mUi->table->item(row, 0)->text();
-        tmp.name     = mUi->table->item(row, 1)->text();
-        tmp.price    = mUi->table->item(row, 2)->text().toDouble();
-        tmp.pledge   = mUi->table->item(row, 3)->text().toDouble();
-        tmp.type     = static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex());
-
-        emit equipmentChosen(tmp);
+        emit equipmentChosen(mEquipment.at(row));
         mDialog.close();
     }
     catch (QString& e)
@@ -103,12 +94,12 @@ void ChooseEquipment::printDefaultTable(void)
 
 void ChooseEquipment::printEquipment()
 {
-    QVector<Common::EquipmentParameters> equipment = mDatabase.getEquipment(
+    mEquipment = mDatabase.getEquipment(
         static_cast<Common::EquipmentType>(mUi->equipmentType->currentIndex()), RENTAL_ID);
 
     int rowCnt = 0;
     mUi->table->setRowCount(0);
-    for (Common::EquipmentParameters eq : equipment)
+    for (Common::EquipmentParameters eq : mEquipment)
     {
         int columnCnt = 0;
         mUi->table->insertRow(rowCnt);

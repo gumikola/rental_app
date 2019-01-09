@@ -194,6 +194,7 @@ void Database::addHire(Common::RentDetails& hire)
     QSqlQuery q;
     uint      clientId = 0;
     uint      eqId     = 0;
+    uint      amount   = 0;
 
     q.prepare("SELECT id FROM public.klient WHERE imie=? AND nazwisko=? AND adres=?");
 
@@ -219,9 +220,10 @@ void Database::addHire(Common::RentDetails& hire)
         return;
     }
 
-    q.prepare("SELECT id FROM public.sprzet WHERE producent=? AND nazwa=? AND ilosc=? AND cena=? "
-              "AND zastaw=? AND typy_id=? "
-              "AND odzialy_id=?;");
+    q.prepare(
+        "SELECT id, ilosc FROM public.sprzet WHERE producent=? AND nazwa=? AND ilosc=? AND cena=? "
+        "AND zastaw=? AND typy_id=? "
+        "AND odzialy_id=?;");
 
     q.bindValue(0, hire.equipment.producer);
     q.bindValue(1, hire.equipment.name);
@@ -231,11 +233,17 @@ void Database::addHire(Common::RentDetails& hire)
     q.bindValue(5, static_cast<uint>(hire.equipment.type));
     q.bindValue(6, RENTAL_ID);
 
+    qDebug() << hire.equipment.producer << "   " << hire.equipment.name << "   "
+             << hire.equipment.amount << "   " << hire.equipment.price << "   "
+             << hire.equipment.pledge << "   " << static_cast<uint>(hire.equipment.type) << "   "
+             << RENTAL_ID;
+
     if (q.exec())
     {
         if (q.first())
         {
-            eqId = q.value("id").toUInt();
+            eqId   = q.value("id").toUInt();
+            amount = q.value("ilosc").toUInt();
         }
         else
         {
@@ -257,6 +265,27 @@ void Database::addHire(Common::RentDetails& hire)
     q.bindValue(2, static_cast<uint>(Common::Status::Hired));
     q.bindValue(3, clientId);
     q.bindValue(4, eqId);
+
+    q.exec();
+    if (q.lastError().isValid())
+    {
+        qDebug() << q.lastError();
+        return;
+    }
+
+    //#TODO
+    q.prepare("UPDATE public.sprzet SET ilosc=?"
+              "WHERE producent=? AND nazwa=? AND ilosc=? AND cena=? AND zastaw=? AND "
+              "typy_id=? AND odzialy_id=?;");
+
+    q.bindValue(0, amount - 1);
+    q.bindValue(1, hire.equipment.producer);
+    q.bindValue(2, hire.equipment.name);
+    q.bindValue(3, hire.equipment.amount);
+    q.bindValue(4, hire.equipment.price);
+    q.bindValue(5, hire.equipment.pledge);
+    q.bindValue(6, static_cast<uint>(hire.equipment.type));
+    q.bindValue(7, RENTAL_ID);
 
     q.exec();
     if (q.lastError().isValid())
@@ -357,7 +386,7 @@ void Database::addEquipment(const Common::EquipmentParameters& eq, const Common:
         qDebug() << q.lastError();
 }
 
-void Database::removeHire(Common::RentDetails& hire)
+void Database::removeHire(const Common::RentDetails& hire)
 {
     qDebug("Database remove hire");
 
@@ -372,8 +401,79 @@ void Database::removeHire(Common::RentDetails& hire)
         qDebug() << q.lastError();
 }
 
-void Database::markAsCompleted(Common::RentDetails)
+void Database::markAsCompleted(const Common::RentDetails& hire)
 {
     qDebug("Database mark as completed");
+    QSqlQuery q;
+
+    q.prepare("UPDATE public.zamowienia SET status=0 WHERE id=?;");
+
+    q.bindValue(0, hire.id);
+
+    q.exec();
+    if (q.lastError().isValid())
+    {
+        qDebug() << q.lastError();
+        return;
+    }
+
+    q.prepare("SELECT sprzet_id FROM public.zamowienia WHERE id=?;");
+
+    q.bindValue(0, hire.id);
+
+    uint sprzet_id = 0;
+    if (q.exec())
+    {
+        if (q.first())
+        {
+            sprzet_id = q.value("sprzet_id").toUInt();
+        }
+        else
+        {
+            qDebug("Database::addHire sprzet_id not found");
+            return;
+        }
+    }
+    else
+    {
+        qDebug() << q.lastError();
+        return;
+    }
+
+    q.prepare("SELECT ilosc FROM public.sprzet WHERE id=?;");
+
+    q.bindValue(0, sprzet_id);
+
+    uint ilosc = 0;
+
+    if (q.exec())
+    {
+        if (q.first())
+        {
+            ilosc = q.value("ilosc").toUInt();
+        }
+        else
+        {
+            qDebug("Database::addHire ilosc not found");
+            return;
+        }
+    }
+    else
+    {
+        qDebug() << q.lastError();
+        return;
+    }
+
+    q.prepare("UPDATE public.sprzet SET ilosc=? WHERE id=?;");
+
+    q.bindValue(0, ilosc + 1);
+    q.bindValue(1, sprzet_id);
+
+    q.exec();
+    if (q.lastError().isValid())
+    {
+        qDebug() << q.lastError();
+        return;
+    }
 }
 } // namespace Backend

@@ -59,28 +59,18 @@ void RentsTab::displayMenu(QPoint pos)
         int row = mTable.currentRow();
         qDebug("remove choosed row index=%d", row);
 
-        Common::RentDetails tmp;
-        //        tmp.equipmentName = mTable.item(row, 0)->text();
-        //        tmp.amount        = mTable.item(row, 1)->text().toUInt();
-        //        tmp.name          = mTable.item(row, 2)->text();
-        //        tmp.surname       = mTable.item(row, 3)->text();
+        mDatabase.removeHire(mRents.at(row));
 
-        mDatabase.removeHire(tmp);
-
-        // nazwa ilosc imie nazisko
+        printRents();
     }
     if (a == completed)
     {
         int row = mTable.currentRow();
         qDebug("closed choosed row index=%d", row);
 
-        Common::RentDetails tmp;
-        //        tmp.equipmentName = mTable.item(row, 0)->text();
-        //        tmp.amount        = mTable.item(row, 1)->text().toUInt();
-        //        tmp.name          = mTable.item(row, 2)->text();
-        //        tmp.surname       = mTable.item(row, 3)->text();
+        mDatabase.markAsCompleted(mRents.at(row));
 
-        mDatabase.markAsCompleted(tmp);
+        printRents();
     }
 }
 
@@ -128,17 +118,23 @@ void RentsTab::printDefaultTable(void)
 
 void RentsTab::printRents()
 {
-    QVector<Common::RentDetails> rents =
-        mDatabase.getRents(static_cast<Common::EquipmentType>(mEquipmentType.currentIndex()));
+    if (mEquipmentType.currentIndex() <= 0)
+    {
+        printDefaultTable();
+        return;
+    }
+
+    mRents = mDatabase.getRents(static_cast<Common::EquipmentType>(mEquipmentType.currentIndex()));
 
     int rowCnt = 0;
     mTable.setRowCount(0);
-    for (Common::RentDetails rent : rents)
+    for (Common::RentDetails rent : mRents)
     {
         int columnCnt = 0;
         mTable.insertRow(rowCnt);
         mTable.setVerticalHeaderItem(rowCnt, new QTableWidgetItem());
-        mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(rent.rentDate.toString()));
+        mTable.setItem(rowCnt, columnCnt++,
+                       new QTableWidgetItem(rent.rentDate.toString("hh:mm     dd.MM.yyyy")));
         mTable.setItem(rowCnt, columnCnt++,
                        new QTableWidgetItem(Common::equipmentTypeToString(rent.equipment.type)));
         mTable.setItem(rowCnt, columnCnt++, new QTableWidgetItem(rent.equipment.name));

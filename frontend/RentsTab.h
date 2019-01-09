@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "ui_mainwindow.h"
 #include <QComboBox>
 #include <QObject>
@@ -16,11 +17,12 @@ class RentsTab : public QObject
 {
     Q_OBJECT
 
-    Ui::MainWindow*    mUi;
-    QComboBox&         mEquipmentType;
-    QTableWidget&      mTable;
-    QPushButton&       mAddHire;
-    Backend::Database& mDatabase;
+    Ui::MainWindow*              mUi;
+    QComboBox&                   mEquipmentType;
+    QTableWidget&                mTable;
+    QPushButton&                 mAddHire;
+    Backend::Database&           mDatabase;
+    QVector<Common::RentDetails> mRents;
 
     void printDefaultTable(void);
     void printRents();

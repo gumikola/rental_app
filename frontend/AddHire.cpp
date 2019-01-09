@@ -55,8 +55,8 @@ void AddHire::chooseEquipmentPressed()
 {
     qDebug("%s", __func__);
     ChooseEquipment window(mDatabase);
-    connect(&window, SIGNAL(equipmentChosen(Common::EquipmentParameters&)), this,
-            SLOT(equipmentChosen(Common::EquipmentParameters&)));
+    connect(&window, SIGNAL(equipmentChosen(const Common::EquipmentParameters&)), this,
+            SLOT(equipmentChosen(const Common::EquipmentParameters&)));
     window.exec();
 }
 
@@ -102,7 +102,7 @@ void AddHire::clientChoosed(Common::ClientDetails& client)
     printChoosenClient(client);
 }
 
-void AddHire::printEquipment(Common::EquipmentParameters& eq)
+void AddHire::printEquipment(const Common::EquipmentParameters& eq)
 {
     int rowCnt = 0;
     mUi->choosenEquipmentTable->setRowCount(0);
@@ -118,7 +118,7 @@ void AddHire::printEquipment(Common::EquipmentParameters& eq)
                                         new QTableWidgetItem(QString::number(eq.pledge)));
 }
 
-void AddHire::equipmentChosen(Common::EquipmentParameters& eq)
+void AddHire::equipmentChosen(const Common::EquipmentParameters& eq)
 {
     qDebug("%s", __func__);
 

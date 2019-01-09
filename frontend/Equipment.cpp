@@ -117,6 +117,7 @@ void Equipment::addEqPressed()
 void Equipment::tabChanged(int)
 {
     printDefaultTable();
+    printFiltredEquipment(mUi->EquipmentTabNameFiltr->text());
 }
 
 void Equipment::filterChanged(const QString& text)
@@ -190,6 +191,12 @@ void Equipment::printEquipment(const Common::EquipmentType& type, uint rental_id
 
 void Equipment::printFiltredEquipment(const QString& filter)
 {
+    if (mEquipmentType.currentIndex() <= 0 and mUi->equipmentRentalBox->currentIndex() <= 0)
+    {
+        printDefaultTable();
+        return;
+    }
+
     QVector<Common::EquipmentParameters> equipment =
         mDatabase.getEquipment(static_cast<Common::EquipmentType>(mEquipmentType.currentIndex()),
                                static_cast<uint>(mUi->equipmentRentalBox->currentIndex()));

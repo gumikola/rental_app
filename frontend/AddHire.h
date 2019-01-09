@@ -23,7 +23,7 @@ class AddHire : public QObject
     void printDefaultEquipmentTable(void);
     void printDefaultClientTable(void);
     void printChoosenClient(Common::ClientDetails& client);
-    void printEquipment(Common::EquipmentParameters& eq);
+    void printEquipment(const Common::EquipmentParameters& eq);
 
 public:
     explicit AddHire(Backend::Database& database);
@@ -37,7 +37,7 @@ public slots:
     void hirePressed();
     void cancelPressed();
     void clientChoosed(Common::ClientDetails& client);
-    void equipmentChosen(Common::EquipmentParameters& eq);
+    void equipmentChosen(const Common::EquipmentParameters& eq);
 };
 
 } // namespace Frontend

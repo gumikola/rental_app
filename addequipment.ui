@@ -298,7 +298,7 @@
          </font>
         </property>
         <property name="text">
-         <string>zł.</string>
+         <string>zł/h.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

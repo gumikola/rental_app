@@ -28,8 +28,8 @@ public:
 
     void                         addHire(Common::RentDetails& hire);
     QVector<Common::RentDetails> getRents(const Common::EquipmentType type);
-    void                         removeHire(Common::RentDetails& hire);
-    void                         markAsCompleted(Common::RentDetails);
+    void                         removeHire(const Common::RentDetails& hire);
+    void                         markAsCompleted(const Common::RentDetails& hire);
 };
 
 } // namespace Backend

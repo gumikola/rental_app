@@ -15,9 +15,10 @@ class ChooseEquipment : public QObject
 {
     Q_OBJECT
 
-    Ui::ChooseEquipment* mUi;
-    QDialog              mDialog;
-    Backend::Database&   mDatabase;
+    Ui::ChooseEquipment*                 mUi;
+    QDialog                              mDialog;
+    Backend::Database&                   mDatabase;
+    QVector<Common::EquipmentParameters> mEquipment;
 
     void printDefaultTable(void);
     void printEquipment();
@@ -27,7 +28,7 @@ public:
     void exec();
 
 signals:
-    void equipmentChosen(Common::EquipmentParameters& eq);
+    void equipmentChosen(const Common::EquipmentParameters& eq);
 
 public slots:
     void addPressed();
