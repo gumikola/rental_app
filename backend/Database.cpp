@@ -26,14 +26,29 @@ void Database::addClient(const Common::ClientDetails& client)
 {
     qDebug("Database %s", __func__);
     QSqlQuery q;
+    uint      last_id = 0;
+
+    q.prepare("SELECT max(id) FROM public.klient");
+    if (q.exec())
+    {
+        while (q.next())
+        {
+            last_id = q.value(0).toUInt();
+        }
+    }
+    else
+    {
+        qDebug() << q.lastError();
+    }
 
     q.prepare("INSERT INTO public.klient("
-              "imie, nazwisko, adres)"
-              "VALUES (?, ?, ?);");
+              "id,imie, nazwisko, adres)"
+              "VALUES (?,?, ?, ?);");
 
-    q.bindValue(0, client.name);
-    q.bindValue(1, client.surname);
-    q.bindValue(2, client.adress);
+    q.bindValue(0, last_id + 1);
+    q.bindValue(1, client.name);
+    q.bindValue(2, client.surname);
+    q.bindValue(3, client.adress);
 
     q.exec();
     if (q.lastError().isValid())
