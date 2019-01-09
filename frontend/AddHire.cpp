@@ -171,8 +171,8 @@ void AddHire::printDefaultEquipmentTable(void)
     for (int i = 0; i < columnCnt; i++)
     {
         if (i == 0 or i == 1)
-            mUi->choosenEquipmentTable->setColumnWidth(i,
-                                                       mUi->choosenEquipmentTable->width() / 4 - 6);
+            mUi->choosenEquipmentTable->setColumnWidth(i, mUi->choosenEquipmentTable->width() / 4 -
+                                                              24);
         else
             mUi->choosenEquipmentTable->setColumnWidth(
                 i, (mUi->choosenEquipmentTable->width() / 2) / (columnCnt - 2));
@@ -203,7 +203,7 @@ void AddHire::printDefaultClientTable(void)
     for (int i = 0; i < columnCnt; i++)
     {
         if (i == 2)
-            mUi->choosenClientTable->setColumnWidth(i, mUi->choosenClientTable->width() / 2 - 6);
+            mUi->choosenClientTable->setColumnWidth(i, mUi->choosenClientTable->width() / 2 - 24);
         else
             mUi->choosenClientTable->setColumnWidth(i, (mUi->choosenClientTable->width() / 2) /
                                                            (columnCnt - 1));
