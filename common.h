@@ -3,7 +3,11 @@
 #include <QDateTime>
 #include <QString>
 
+#ifdef __linux__
+#define RENTAL_ID 2
+#elif _WIN32
 #define RENTAL_ID 1
+#endif
 
 class QComboBox;
 
