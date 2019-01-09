@@ -101,6 +101,7 @@ void ChooseEquipment::printEquipment()
     mUi->table->setRowCount(0);
     for (Common::EquipmentParameters eq : mEquipment)
     {
+
         int columnCnt = 0;
         mUi->table->insertRow(rowCnt);
         mUi->table->setVerticalHeaderItem(rowCnt, new QTableWidgetItem());
